@@ -1,10 +1,14 @@
 package com.example.yinfuapp.ui.fragment
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,6 +31,16 @@ class AiChatFragment : Fragment() {
     private lateinit var chatHistoryManager: ChatHistoryManager
     private lateinit var voiceHelper: VoiceHelper
     private lateinit var audioPlayer: AudioPlayerHelper
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            startVoiceRecording()
+        } else {
+            Toast.makeText(context, "需要麦克风权限才能使用语音功能", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     private val systemPrompt = """你是温暖关怀的心理陪伴助手。简洁回复，倾听支持。
 原则：
@@ -124,6 +138,13 @@ class AiChatFragment : Fragment() {
     }
 
     private fun startVoiceRecording() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            return
+        }
+        
         val file = voiceHelper.startRecording()
         if (file != null) {
             binding.voiceButton.setIconResource(com.example.yinfuapp.R.drawable.ic_stop)

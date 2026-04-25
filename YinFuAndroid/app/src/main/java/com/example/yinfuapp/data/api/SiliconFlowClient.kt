@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit
 object SiliconFlowClient {
     
     private const val BASE_URL = "https://api.siliconflow.cn/v1"
-    private const val API_KEY = "sk-your-api-key-here"
+    private const val API_KEY = "sk-yckdyvnnixuckmwqkqjpbjltfipybwuviznbkorrzbegzbyf"
     
     private val client = OkHttpClient.Builder()
         .connectTimeout(60, TimeUnit.SECONDS)
