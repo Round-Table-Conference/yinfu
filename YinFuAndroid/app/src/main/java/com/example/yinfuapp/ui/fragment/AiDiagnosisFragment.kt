@@ -9,12 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.yinfuapp.data.adapter.ChatAdapter
-import com.example.yinfuapp.data.api.RetrofitClient
+import com.example.yinfuapp.data.api.SiliconFlowClient
 import com.example.yinfuapp.data.local.ChatHistoryManager
-import com.example.yinfuapp.data.model.ChatMessage
-import com.example.yinfuapp.data.model.Message
 import com.example.yinfuapp.databinding.FragmentAiDiagnosisBinding
+import com.example.yinfuapp.utils.AudioPlayerHelper
+import com.example.yinfuapp.utils.VoiceHelper
 import kotlinx.coroutines.launch
+import java.io.File
 
 class AiDiagnosisFragment : Fragment() {
 
@@ -22,8 +23,10 @@ class AiDiagnosisFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var chatAdapter: ChatAdapter
-    private val messages = mutableListOf<ChatMessage>()
+    private val messages = mutableListOf<com.example.yinfuapp.data.model.ChatMessage>()
     private lateinit var chatHistoryManager: ChatHistoryManager
+    private lateinit var voiceHelper: VoiceHelper
+    private lateinit var audioPlayer: AudioPlayerHelper
 
     private val systemPrompt = """你是专业AI医疗助手。请简洁回复用户症状咨询。
 规则：

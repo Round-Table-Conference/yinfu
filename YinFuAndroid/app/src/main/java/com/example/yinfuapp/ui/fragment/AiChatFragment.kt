@@ -9,12 +9,13 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.yinfuapp.data.adapter.ChatAdapter
-import com.example.yinfuapp.data.api.RetrofitClient
+import com.example.yinfuapp.data.api.SiliconFlowClient
 import com.example.yinfuapp.data.local.ChatHistoryManager
-import com.example.yinfuapp.data.model.ChatMessage
-import com.example.yinfuapp.data.model.Message
 import com.example.yinfuapp.databinding.FragmentAiChatBinding
+import com.example.yinfuapp.utils.AudioPlayerHelper
+import com.example.yinfuapp.utils.VoiceHelper
 import kotlinx.coroutines.launch
+import java.io.File
 
 class AiChatFragment : Fragment() {
 
@@ -24,6 +25,8 @@ class AiChatFragment : Fragment() {
     private lateinit var chatAdapter: ChatAdapter
     private val messages = mutableListOf<ChatMessage>()
     private lateinit var chatHistoryManager: ChatHistoryManager
+    private lateinit var voiceHelper: VoiceHelper
+    private lateinit var audioPlayer: AudioPlayerHelper
 
     private val systemPrompt = """你是温暖关怀的心理陪伴助手。简洁回复，倾听支持。
 原则：
@@ -44,6 +47,8 @@ class AiChatFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         chatHistoryManager = ChatHistoryManager.getInstance(requireContext())
+        voiceHelper = VoiceHelper(requireContext())
+        audioPlayer = AudioPlayerHelper(requireContext())
         setupRecyclerView()
         setupClickListeners()
         loadHistory()
@@ -69,6 +74,14 @@ class AiChatFragment : Fragment() {
             val message = binding.messageInput.text.toString().trim()
             if (message.isNotEmpty()) {
                 sendMessage(message)
+            }
+        }
+
+        binding.voiceButton.setOnClickListener {
+            if (voiceHelper.isRecording()) {
+                stopVoiceRecording()
+            } else {
+                startVoiceRecording()
             }
         }
     }
@@ -110,6 +123,57 @@ class AiChatFragment : Fragment() {
         chatWithAI(content)
     }
 
+    private fun startVoiceRecording() {
+        val file = voiceHelper.startRecording()
+        if (file != null) {
+            binding.voiceButton.setIconResource(com.example.yinfuapp.R.drawable.ic_stop)
+            Toast.makeText(context, "开始录音", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun stopVoiceRecording() {
+        val audioFile = voiceHelper.stopRecording()
+        binding.voiceButton.setIconResource(com.example.yinfuapp.R.drawable.ic_mic)
+
+        audioFile?.let { processVoiceInput(it) }
+    }
+
+    private fun processVoiceInput(audioFile: File) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val historyMessages = messages
+                .filter { !it.isFromUser && it.content != "您好！我在这里陪伴您。有什么想聊的，或者有什么心事想倾诉吗？我会用心倾听并陪伴您。" }
+                .map { "assistant" to it.content }
+
+            val result = SiliconFlowClient.chatWithAudio(
+                audioFile = audioFile,
+                systemPrompt = systemPrompt,
+                historyMessages = historyMessages
+            )
+
+            result.onSuccess { recognizedText ->
+                activity?.runOnUiThread {
+                    binding.messageInput.setText(recognizedText)
+                    sendMessage(recognizedText)
+                }
+            }.onFailure { error ->
+                activity?.runOnUiThread {
+                    Toast.makeText(context, "语音识别失败: ${error.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private fun playAIResponse(text: String) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val result = SiliconFlowClient.textToSpeech(text)
+            result.onSuccess { audioFile ->
+                activity?.runOnUiThread {
+                    audioPlayer.playFile(audioFile)
+                }
+            }
+        }
+    }
+
     private fun scrollToBottom() {
         binding.chatRecyclerView.post {
             if (messages.isNotEmpty()) {
@@ -121,47 +185,49 @@ class AiChatFragment : Fragment() {
     private fun chatWithAI(userMessage: String) {
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val requestMessages = mutableListOf<Message>()
-                requestMessages.add(Message(role = "system", content = systemPrompt))
+                val requestMessages = mutableListOf<Map<String, Any>>()
+                requestMessages.add(mapOf(
+                    "role" to "system",
+                    "content" to listOf(mapOf("type" to "text", "text" to systemPrompt))
+                ))
                 messages.filter { !it.isFromUser && it.content != "您好！我在这里陪伴您。有什么想聊的，或者有什么心事想倾诉吗？我会用心倾听并陪伴您。" }
-                    .forEach { requestMessages.add(Message(role = "assistant", content = it.content)) }
-                requestMessages.add(Message(role = "user", content = userMessage))
+                    .forEach { 
+                        requestMessages.add(mapOf(
+                            "role" to "assistant",
+                            "content" to listOf(mapOf("type" to "text", "text" to it.content))
+                        ))
+                    }
+                requestMessages.add(mapOf(
+                    "role" to "user",
+                    "content" to listOf(mapOf("type" to "text", "text" to userMessage))
+                ))
 
-                val request = com.example.yinfuapp.data.model.AiChatRequest(messages = requestMessages)
-                val response = RetrofitClient.apiService.aiChat(request)
+                val result = SiliconFlowClient.chatWithText(requestMessages)
 
-                val aiContent = if (response.data != null) {
-                    val dataMap = response.data as? Map<*, *>
-                    dataMap?.get("content") as? String ?: "抱歉，我现在无法回答您的问题，请稍后再试。"
-                } else {
-                    response.message
+                result.onSuccess { aiContent ->
+                    val aiMessage = ChatMessage(
+                        content = aiContent,
+                        isFromUser = false
+                    )
+                    messages.add(aiMessage)
+                    chatAdapter.submitList(messages.toList())
+                    scrollToBottom()
+                    saveHistory()
+                    playAIResponse(aiContent)
+                }.onFailure { error ->
+                    Toast.makeText(context, "AI 回复失败: ${error.message}", Toast.LENGTH_SHORT).show()
                 }
-
-                val aiMessage = ChatMessage(
-                    content = aiContent,
-                    isFromUser = false
-                )
-                messages.add(aiMessage)
-                chatAdapter.submitList(messages.toList())
-                scrollToBottom()
-                saveHistory()
 
             } catch (e: Exception) {
                 Toast.makeText(context, "网络错误: ${e.message}", Toast.LENGTH_SHORT).show()
-                val errorMessage = ChatMessage(
-                    content = "抱歉，发生了网络错误。请检查您的网络连接后重试。",
-                    isFromUser = false
-                )
-                messages.add(errorMessage)
-                chatAdapter.submitList(messages.toList())
-                scrollToBottom()
-                saveHistory()
             }
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        voiceHelper.release()
+        audioPlayer.release()
         saveHistory()
         _binding = null
     }
