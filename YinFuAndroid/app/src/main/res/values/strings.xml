@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">银龄心伴</string>
+
+    <string name="welcome_title">欢迎使用银龄心伴</string>
+    <string name="welcome_subtitle">关爱老年人，科技暖人心</string>
+
+    <string name="tab_home">首页</string>
+    <string name="tab_health">健康</string>
+    <string name="tab_travel">出行</string>
+    <string name="tab_psychology">心理</string>
+    <string name="tab_profile">我的</string>
+
+    <string name="emergency_sos">紧急求救</string>
+    <string name="health_management">健康管理</string>
+    <string name="psychology_support">心理陪伴</string>
+    <string name="payment_help">支付帮助</string>
+    <string name="digital_classroom">数字课堂</string>
+
+    <string name="medical_guide">就医指导</string>
+    <string name="medication_reminder">用药提醒</string>
+    <string name="ai_diagnosis">AI 问诊</string>
+    <string name="health_records">健康档案</string>
+
+    <string name="bus_query">公交查询</string>
+    <string name="subway">地铁</string>
+    <string name="taxi">打车</string>
+    <string name="location_guard">行程守护</string>
+
+    <string name="ai_chat">AI聊天</string>
+    <string name="psychology_test">心理测试</string>
+    <string name="relaxation">放松训练</string>
+    <string name="counselor">咨询师</string>
+
+    <string name="scan_pay">扫码支付</string>
+    <string name="payment_guide">支付指引</string>
+    <string name="bankcard">支付宝付款码</string>
+    <string name="transaction">微信付款码</string>
+
+    <string name="login">登录</string>
+    <string name="register">注册</string>
+    <string name="logout">退出登录</string>
+    <string name="username">用户名</string>
+    <string name="password">密码</string>
+    <string name="confirm_password">确认密码</string>
+    <string name="phone">手机号</string>
+    <string name="forgot_password">忘记密码？</string>
+    <string name="no_account">没有账号？立即注册</string>
+    <string name="has_account">已有账号？立即登录</string>
+
+    <string name="sos_title">紧急求救</string>
+    <string name="sos_message">长按按钮拨打紧急联系人</string>
+    <string name="sos_hint">长按3秒拨打求救电话</string>
+
+    <string name="course_category">课程分类</string>
+    <string name="popular_courses">热门课程</string>
+    <string name="learning_progress">学习进度</string>
+    <string name="phone_basic">手机基础</string>
+    <string name="network_security">网络安全</string>
+    <string name="social_media">社交媒体</string>
+    <string name="life_service">生活服务</string>
+
+    <string name="search_hint">搜索路线</string>
+    <string name="from">起点</string>
+    <string name="to">终点</string>
+    <string name="search">搜索</string>
+    <string name="call_taxi">一键叫车</string>
+
+    <string name="save">保存</string>
+    <string name="cancel">取消</string>
+    <string name="confirm">确认</string>
+    <string name="next">下一步</string>
+    <string name="back">返回</string>
+</resources>

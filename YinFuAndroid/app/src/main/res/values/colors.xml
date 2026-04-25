@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary">#C97B4F</color>
+    <color name="primary_dark">#B96B3F</color>
+    <color name="primary_light">#D98B5F</color>
+
+    <color name="secondary">#5A7F6E</color>
+
+    <color name="accent">#B5544B</color>
+
+    <color name="success">#5A7F6E</color>
+    <color name="danger">#B5544B</color>
+    <color name="warning">#FECA57</color>
+    <color name="info">#54A0FF</color>
+
+    <color name="text_primary">#2D261E</color>
+    <color name="text_secondary">#6A5F4D</color>
+    <color name="text_disabled">#988F81</color>
+    <color name="text_inverse">#FFF9F0</color>
+
+    <color name="bg_page">#FFF9F0</color>
+    <color name="bg_card">#FFFFFF</color>
+    <color name="bg_light">#F8F5F0</color>
+
+    <color name="border">#E0D6C9</color>
+    <color name="border_dark">#D0C6B9</color>
+    <color name="border_light">#F0E6D9</color>
+
+    <color name="disabled">#C9B8A3</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+
+    <color name="transparent">#00000000</color>
+
+    <color name="sos_red">#E53935</color>
+    <color name="sos_red_dark">#C62828</color>
+
+    <color name="tab_selected">#C97B4F</color>
+    <color name="tab_unselected">#6A5F4D</color>
+
+    <color name="card_background">#FFFFFF</color>
+    <color name="input_background">#F8F5F0</color>
+    <color name="text_hint">#988F81</color>
+</resources>

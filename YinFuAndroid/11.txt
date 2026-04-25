@@ -1,0 +1,367 @@
+//
+// Decompiled by Jadx (from NP Manager)
+//
+package com.oplus.pay.channel.cn.wx.ui;
+
+import android.app.Dialog;
+import android.content.Intent;
+import android.os.Bundle;
+import androidx.appcompat.app.AppCompatActivity;
+import com.meituan.robust.ChangeQuickRedirect;
+import com.meituan.robust.PatchProxy;
+import com.oplus.pay.basic.PayLogUtil;
+import com.oplus.pay.basic.util.digest.DigestHelper;
+import com.oplus.pay.biz.cta.e;
+import com.oplus.pay.biz.model.BizExt;
+import com.oplus.pay.config.ConfigHelper;
+import com.oplus.pay.config.model.CloudConfigInfo;
+import com.oplus.pay.config.model.CommonConfig;
+import com.oplus.pay.outcomes.OutcomesCode;
+import com.oplus.pay.outcomes.OutcomesParam;
+import com.platform.usercenter.trace.rumtime.AutoTrace;
+import com.tencent.mm.opensdk.modelpay.JumpToOfflinePay.Req;
+import com.tencent.mm.opensdk.openapi.IWXAPI;
+import kotlin.jvm.internal.r;
+import sk.m;
+import tk.a;
+import tk.a.c;
+import xj.b;
+import xu.n0;
+
+/* compiled from: QRCodePayActivity.kt */
+public final class QRCodePayActivity extends AppCompatActivity {
+    public static ChangeQuickRedirect changeQuickRedirect;
+    private static final String h = "WeChatOffPay";
+    private String a;
+    private Dialog b;
+    private int c;
+    private final int e = 3;
+    private boolean f;
+    private String g = "";
+
+    private static final void D(QRCodePayActivity qRCodePayActivity) {
+        if (!PatchProxy.proxy(new Object[]{qRCodePayActivity}, null, changeQuickRedirect, true, 3825, new Class[]{QRCodePayActivity.class}, Void.TYPE).isSupported) {
+            r.h(qRCodePayActivity, "this$0");
+            PayLogUtil.k(h, "openWeChatQRCode thread run");
+            if (a.a(qRCodePayActivity) < 8) {
+                String string = qRCodePayActivity.getString(2131822100);
+                r.g(string, "getString(R.string.should_upgrad_wechat)");
+                qRCodePayActivity.x(3, string);
+                QRCodePayActivity qRCodePayActivity2 = qRCodePayActivity;
+                s(qRCodePayActivity2, "3", null, null, qRCodePayActivity.getString(2131822100), 6, null);
+                return;
+            }
+            c c = a.c(qRCodePayActivity, m.e(qRCodePayActivity), true);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            int i = c.a;
+            if (1 != i) {
+                if (9 != i) {
+                    int i2 = qRCodePayActivity.c;
+                    if (i2 < qRCodePayActivity.e) {
+                        String valueOf = String.valueOf(i2);
+                        s(qRCodePayActivity, "4", valueOf, null, null, 12, null);
+                        qRCodePayActivity.F(c.a);
+                    } else {
+                        String string2 = qRCodePayActivity.getString(2131821965, new Object[]{Integer.valueOf(i)});
+                        s(qRCodePayActivity, "2", null, null, string2, 6, null);
+                        String string3 = qRCodePayActivity.getString(2131821965, new Object[]{Integer.valueOf(c.a)});
+                        r.g(string3, "getString(R.string.qrcod…n_failed, result.retCode)");
+                        qRCodePayActivity.x(2, string3);
+                    }
+                }
+            }
+            s(qRCodePayActivity, "1", null, null, null, 14, null);
+            qRCodePayActivity.z();
+        }
+    }
+
+    private final void E(Intent intent) {
+        if (!PatchProxy.proxy(new Object[]{intent}, this, changeQuickRedirect, false, 3814, new Class[]{Intent.class}, Void.TYPE).isSupported) {
+            String action = intent.getAction();
+            if (action == null) {
+                u();
+                return;
+            }
+            try {
+                this.a = intent.getStringExtra("extra_pkg_name");
+                String str = h;
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("offpay source from ");
+                stringBuilder.append(this.a);
+                PayLogUtil.k(str, stringBuilder.toString());
+                if (r.c("com.nearme.pay.qrcode", action)) {
+                    if (this.b == null) {
+                        this.b = new h(this);
+                    }
+                    Dialog dialog = this.b;
+                    if (dialog != null) {
+                        dialog.setCancelable(false);
+                        dialog.setCanceledOnTouchOutside(false);
+                        if (!isFinishing()) {
+                            dialog.show();
+                        }
+                    }
+                    v();
+                }
+            } catch (Exception unused) {
+                u();
+            }
+        }
+    }
+
+    private final void B(IWXAPI iwxapi) {
+        if (!PatchProxy.proxy(new Object[]{iwxapi}, this, changeQuickRedirect, false, 3816, new Class[]{IWXAPI.class}, Void.TYPE).isSupported) {
+            if (iwxapi.getWXAppSupportAPI() >= 620823808) {
+                String str = h;
+                PayLogUtil.k(str, "openNewOfflinePay go new api to open offpay");
+                boolean sendReq = iwxapi.sendReq(new Req());
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("openNewOfflinePay openResult=");
+                stringBuilder.append(sendReq);
+                PayLogUtil.k(str, stringBuilder.toString());
+                if (sendReq) {
+                    s(this, "1", null, null, null, 14, null);
+                    z();
+                } else {
+                    String string = getString(2131821965, new Object[]{Integer.valueOf(2)});
+                    s(this, "2", null, null, string, 6, null);
+                    str = getString(2131821965, new Object[]{Integer.valueOf(2)});
+                    r.g(str, "getString(R.string.qrcod…iled, ResultCode.FAILURE)");
+                    x(2, str);
+                }
+            } else {
+                s(this, "3", null, null, null, 14, null);
+                PayLogUtil.k(h, "the wechat version cant support and downdegrade to old api");
+                C();
+            }
+        }
+    }
+
+    private static final void A(QRCodePayActivity qRCodePayActivity) {
+        QRCodePayActivity qRCodePayActivity2 = qRCodePayActivity;
+        if (!PatchProxy.proxy(new Object[]{qRCodePayActivity2}, null, changeQuickRedirect, true, 3828, new Class[]{QRCodePayActivity.class}, Void.TYPE).isSupported) {
+            r.h(qRCodePayActivity2, "this$0");
+            Dialog dialog = qRCodePayActivity2.b;
+            if (dialog != null) {
+                r.e(dialog);
+                if (dialog.isShowing()) {
+                    dialog = qRCodePayActivity2.b;
+                    r.e(dialog);
+                    dialog.dismiss();
+                }
+            }
+            com.oplus.pay.outcomes.c cVar = com.oplus.pay.outcomes.c.a;
+            String str = qRCodePayActivity2.a;
+            if (str == null) {
+                str = "";
+            }
+            cVar.g(new OutcomesParam("wxpay", str, null, null, null, null, false, false, new BizExt("", "", "", "", "", "", null, null, null, null, "", null, null, null, null, null, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, -1088, null), 252, null), OutcomesCode.CODE_SUCCESS);
+            qRCodePayActivity.u();
+        }
+    }
+
+    private static final void y(QRCodePayActivity qRCodePayActivity) {
+        QRCodePayActivity qRCodePayActivity2 = qRCodePayActivity;
+        if (!PatchProxy.proxy(new Object[]{qRCodePayActivity2}, null, changeQuickRedirect, true, 3827, new Class[]{QRCodePayActivity.class}, Void.TYPE).isSupported) {
+            r.h(qRCodePayActivity2, "this$0");
+            Dialog dialog = qRCodePayActivity2.b;
+            if (dialog != null) {
+                r.e(dialog);
+                if (dialog.isShowing()) {
+                    dialog = qRCodePayActivity2.b;
+                    r.e(dialog);
+                    dialog.dismiss();
+                }
+            }
+            com.oplus.pay.outcomes.c cVar = com.oplus.pay.outcomes.c.a;
+            String str = qRCodePayActivity2.a;
+            if (str == null) {
+                str = "";
+            }
+            cVar.g(new OutcomesParam("wxpay", str, null, null, null, null, false, false, new BizExt("", "", "", "", "", "", null, null, null, null, "", null, null, null, null, null, false, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, -1088, null), 252, null), OutcomesCode.CODE_UNKNOWN);
+            qRCodePayActivity.u();
+        }
+    }
+
+    private final void r(String str, String str2, String str3, String str4) {
+        Class cls = String.class;
+        if (!PatchProxy.proxy(new Object[]{str, str2, str3, str4}, this, changeQuickRedirect, false, 3818, new Class[]{cls, cls, cls, cls}, Void.TYPE).isSupported && e.a.c(this)) {
+            AutoTrace autoTrace = AutoTrace.Companion.get();
+            n0 n0Var = n0.a;
+            String str5 = this.f ? "1" : "2";
+            String str6 = this.a;
+            String str7 = "";
+            if (str6 == null) {
+                str6 = str7;
+            }
+            autoTrace.upload(n0.e(str5, str6, str == null ? str7 : str, str2 == null ? str7 : str2, this.g, str3 == null ? str7 : str3, str4 == null ? str7 : str4));
+        }
+    }
+
+    private final void t() {
+        if (!PatchProxy.proxy(new Object[0], this, changeQuickRedirect, false, 3812, new Class[0], Void.TYPE).isSupported && e.a.c(this)) {
+            AutoTrace autoTrace = AutoTrace.Companion.get();
+            String str = this.f ? "1" : "2";
+            String str2 = this.a;
+            if (str2 == null) {
+                str2 = "";
+            }
+            autoTrace.upload(n0.f(str, str2, this.g));
+        }
+    }
+
+    private final void v() {
+        if (!PatchProxy.proxy(new Object[0], this, changeQuickRedirect, false, 3815, new Class[0], Void.TYPE).isSupported) {
+            IWXAPI f = m.f(this);
+            String str;
+            if (f.registerApp(m.e(this))) {
+                str = h;
+                StringBuilder stringBuilder = new StringBuilder();
+                stringBuilder.append("offpay config isNewOffPay=");
+                stringBuilder.append(this.f);
+                PayLogUtil.k(str, stringBuilder.toString());
+                if (this.f) {
+                    r.g(f, "registered");
+                    B(f);
+                } else {
+                    C();
+                }
+                return;
+            }
+            str = getString(2131821965, new Object[]{Integer.valueOf(-1)});
+            r.g(str, "getString(R.string.qrcode_open_failed, -1)");
+            x(2, str);
+        }
+    }
+
+    public void onCreate(Bundle bundle) {
+        if (!PatchProxy.proxy(new Object[]{bundle}, this, changeQuickRedirect, false, 3810, new Class[]{Bundle.class}, Void.TYPE).isSupported) {
+            super.onCreate(bundle);
+            w();
+            initData();
+            Intent intent = getIntent();
+            if (intent == null) {
+                u();
+            } else {
+                E(intent);
+            }
+            t();
+        }
+    }
+
+    private final void initData() {
+        boolean z = false;
+        if (!PatchProxy.proxy(new Object[0], this, changeQuickRedirect, false, 3811, new Class[0], Void.TYPE).isSupported) {
+            if (e.a.c(this)) {
+                ConfigHelper configHelper = ConfigHelper.a;
+                ConfigHelper.H(configHelper, false, 1.INSTANCE, 1, null);
+                CloudConfigInfo l = configHelper.l();
+                if (l != null) {
+                    CommonConfig commonConfig = l.getCommonConfig();
+                    if (commonConfig != null) {
+                        z = commonConfig.isNewOffPay();
+                    }
+                }
+                this.f = z;
+            }
+            String str = h;
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("QRCodePayActivity isNewOffPay=");
+            stringBuilder.append(this.f);
+            PayLogUtil.k(str, stringBuilder.toString());
+            this.g = DigestHelper.i(String.valueOf(System.currentTimeMillis()));
+        }
+    }
+
+    public void onDestroy() {
+        if (!PatchProxy.proxy(new Object[0], this, changeQuickRedirect, false, 3813, new Class[0], Void.TYPE).isSupported) {
+            super.onDestroy();
+            Dialog dialog = this.b;
+            if (dialog != null && dialog.isShowing()) {
+                dialog.dismiss();
+            }
+        }
+    }
+
+    private final void C() {
+        if (!PatchProxy.proxy(new Object[0], this, changeQuickRedirect, false, 3817, new Class[0], Void.TYPE).isSupported) {
+            this.c++;
+            b.a.g(new f(this));
+        }
+    }
+
+    private final void F(int i) {
+        Class[] clsArr = new Class[]{Integer.TYPE};
+        if (!PatchProxy.proxy(new Object[]{new Integer(i)}, this, changeQuickRedirect, false, 3820, clsArr, Void.TYPE).isSupported) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("重新打开--次数:");
+            stringBuilder.append(this.c);
+            stringBuilder.append("---retCode:");
+            stringBuilder.append(i);
+            PayLogUtil.j(stringBuilder.toString());
+            runOnUiThread(new f(this));
+        }
+    }
+
+    private final void u() {
+        if (!PatchProxy.proxy(new Object[0], this, changeQuickRedirect, false, 3823, new Class[0], Void.TYPE).isSupported) {
+            finish();
+            overridePendingTransition(0, 0);
+        }
+    }
+
+    private final void x(int i, String str) {
+        Class[] clsArr = new Class[]{Integer.TYPE, String.class};
+        if (!PatchProxy.proxy(new Object[]{new Integer(i), str}, this, changeQuickRedirect, false, 3821, clsArr, Void.TYPE).isSupported) {
+            StringBuilder stringBuilder = new StringBuilder();
+            stringBuilder.append("open QRCode failed ");
+            stringBuilder.append(i);
+            stringBuilder.append(" -- ");
+            stringBuilder.append(str);
+            PayLogUtil.d(stringBuilder.toString());
+            runOnUiThread(new f(this));
+        }
+    }
+
+    static {
+        a aVar = new a(null);
+    }
+
+    private static final void G(QRCodePayActivity qRCodePayActivity) {
+        if (!PatchProxy.proxy(new Object[]{qRCodePayActivity}, null, changeQuickRedirect, true, 3826, new Class[]{QRCodePayActivity.class}, Void.TYPE).isSupported) {
+            r.h(qRCodePayActivity, "this$0");
+            qRCodePayActivity.C();
+        }
+    }
+
+    static /* synthetic */ void s(QRCodePayActivity qRCodePayActivity, String str, String str2, String str3, String str4, int i, Object obj) {
+        int i2 = i;
+        Class cls = String.class;
+        if (!PatchProxy.proxy(new Object[]{qRCodePayActivity, str, str2, str3, str4, new Integer(i2), obj}, null, changeQuickRedirect, true, 3819, new Class[]{QRCodePayActivity.class, cls, cls, cls, cls, Integer.TYPE, Object.class}, Void.TYPE).isSupported) {
+            String str5 = "";
+            String str6 = (i2 & 1) != 0 ? str5 : str;
+            String str7 = (i2 & 2) != 0 ? str5 : str2;
+            String str8 = (i2 & 4) != 0 ? str5 : str3;
+            if ((i2 & 8) == 0) {
+                str5 = str4;
+            }
+            qRCodePayActivity.r(str6, str7, str8, str5);
+        }
+    }
+
+    private final void w() {
+        if (!PatchProxy.proxy(new Object[0], this, changeQuickRedirect, false, 3824, new Class[0], Void.TYPE).isSupported) {
+            getWindow().getDecorView().setSystemUiVisibility(3846);
+        }
+    }
+
+    private final void z() {
+        if (!PatchProxy.proxy(new Object[0], this, changeQuickRedirect, false, 3822, new Class[0], Void.TYPE).isSupported) {
+            runOnUiThread(new f(this));
+        }
+    }
+}

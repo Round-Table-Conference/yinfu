@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_page"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:padding="@dimen/spacing_lg">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sos_title"
+            android:textSize="@dimen/font_size_title"
+            android:textColor="@color/text_primary"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/spacing_xl"
+            android:layout_marginBottom="@dimen/spacing_sm"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sos_message"
+            android:textSize="@dimen/font_size_md"
+            android:textColor="@color/text_secondary"
+            android:gravity="center"
+            android:layout_marginBottom="@dimen/spacing_xl"/>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center">
+
+            <Button
+                android:id="@+id/sos_button"
+                android:layout_width="@dimen/sos_button_size"
+                android:layout_height="@dimen/sos_button_size"
+                android:background="@drawable/sos_button_background"
+                android:text="SOS"
+                android:textColor="@color/white"
+                android:textSize="48sp"
+                android:textStyle="bold"/>
+
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/sos_hint"
+            android:textSize="@dimen/font_size_sm"
+            android:textColor="@color/text_secondary"
+            android:gravity="center"
+            android:layout_marginTop="@dimen/spacing_lg"/>
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/spacing_xl"
+            app:cardBackgroundColor="@color/card_background"
+            app:cardCornerRadius="@dimen/card_radius"
+            app:cardElevation="@dimen/card_elevation"
+            xmlns:app="http://schemas.android.com/apk/res-auto">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/spacing_lg">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="@dimen/spacing_md">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="紧急联系人"
+                        android:textSize="@dimen/font_size_lg"
+                        android:textColor="@color/text_primary"
+                        android:textStyle="bold"/>
+
+                    <Button
+                        android:id="@+id/add_contact_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="36dp"
+                        android:text="添加"
+                        android:textSize="@dimen/font_size_sm"
+                        android:background="@drawable/primary_button_background"
+                        android:textColor="@color/white"
+                        android:paddingHorizontal="@dimen/spacing_md"/>
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/contacts_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"/>
+
+                <TextView
+                    android:id="@+id/empty_contacts_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="暂无紧急联系人，请点击添加"
+                    android:textSize="@dimen/font_size_sm"
+                    android:textColor="@color/text_hint"
+                    android:gravity="center"
+                    android:padding="@dimen/spacing_lg"
+                    android:visibility="gone"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+</ScrollView>

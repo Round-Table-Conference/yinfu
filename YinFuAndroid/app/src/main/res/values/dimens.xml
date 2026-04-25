@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="spacing_xs">8dp</dimen>
+    <dimen name="spacing_sm">12dp</dimen>
+    <dimen name="spacing_md">20dp</dimen>
+    <dimen name="spacing_lg">28dp</dimen>
+    <dimen name="spacing_xl">36dp</dimen>
+
+    <dimen name="font_size_xs">16sp</dimen>
+    <dimen name="font_size_sm">18sp</dimen>
+    <dimen name="font_size_md">20sp</dimen>
+    <dimen name="font_size_base">22sp</dimen>
+    <dimen name="font_size_lg">24sp</dimen>
+    <dimen name="font_size_xl">26sp</dimen>
+    <dimen name="font_size_title">28sp</dimen>
+
+    <dimen name="button_height">64dp</dimen>
+    <dimen name="button_height_large">72dp</dimen>
+
+    <dimen name="icon_size_sm">32dp</dimen>
+    <dimen name="icon_size_md">48dp</dimen>
+    <dimen name="icon_size_lg">64dp</dimen>
+
+    <dimen name="card_radius">12dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
+
+    <dimen name="sos_button_size">200dp</dimen>
+
+    <dimen name="bottom_nav_height">80dp</dimen>
+</resources>
