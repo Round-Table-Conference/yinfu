@@ -76,19 +76,38 @@
             app:backgroundTint="@color/primary"
             app:cornerRadius="24dp"/>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/voice_button"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+        <LinearLayout
+            android:id="@+id/voice_button_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            app:icon="@drawable/ic_mic"
-            app:iconGravity="textStart"
-            app:iconPadding="0dp"
-            app:iconSize="24dp"
-            app:backgroundTint="@color/secondary"
-            app:cornerRadius="24dp"/>
+            android:orientation="vertical"
+            android:gravity="center">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/voice_button"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:icon="@drawable/ic_mic"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp"
+                app:iconSize="24dp"
+                app:backgroundTint="@color/secondary"
+                app:cornerRadius="24dp"/>
+
+            <TextView
+                android:id="@+id/voice_hint"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="长按说话"
+                android:textSize="10sp"
+                android:textColor="@color/text_hint"
+                android:visibility="visible"/>
+
+        </LinearLayout>
 
     </LinearLayout>
 

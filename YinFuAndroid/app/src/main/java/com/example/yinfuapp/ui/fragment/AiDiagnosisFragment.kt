@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
@@ -12,9 +13,11 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.yinfuapp.R
 import com.example.yinfuapp.data.adapter.ChatAdapter
 import com.example.yinfuapp.data.api.SiliconFlowClient
 import com.example.yinfuapp.data.local.ChatHistoryManager
+import com.example.yinfuapp.data.model.ChatMessage
 import com.example.yinfuapp.databinding.FragmentAiDiagnosisBinding
 import com.example.yinfuapp.utils.AudioPlayerHelper
 import com.example.yinfuapp.utils.VoiceHelper
@@ -91,11 +94,26 @@ class AiDiagnosisFragment : Fragment() {
             }
         }
 
-        binding.voiceButton.setOnClickListener {
-            if (voiceHelper.isRecording()) {
-                stopVoiceRecording()
-            } else {
-                startVoiceRecording()
+        binding.voiceButton.setOnTouchListener { _, event ->
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO)
+                        != PackageManager.PERMISSION_GRANTED
+                    ) {
+                        requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+                        false
+                    } else {
+                        startVoiceRecording()
+                        true
+                    }
+                }
+                MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                    if (voiceHelper.isRecording()) {
+                        stopVoiceRecording()
+                    }
+                    true
+                }
+                else -> false
             }
         }
     }
@@ -138,25 +156,27 @@ class AiDiagnosisFragment : Fragment() {
     }
 
     private fun startVoiceRecording() {
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-            return
-        }
-        
         val file = voiceHelper.startRecording()
         if (file != null) {
-            binding.voiceButton.setIconResource(com.example.yinfuapp.R.drawable.ic_stop)
-            Toast.makeText(context, "开始录音", Toast.LENGTH_SHORT).show()
+            binding.voiceButton.setIconResource(R.drawable.ic_stop)
+            binding.voiceButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.danger))
+            binding.voiceHint.text = "正在录音..."
+            binding.voiceHint.setTextColor(ContextCompat.getColor(requireContext(), R.color.danger))
         }
     }
 
     private fun stopVoiceRecording() {
         val audioFile = voiceHelper.stopRecording()
-        binding.voiceButton.setIconResource(com.example.yinfuapp.R.drawable.ic_mic)
+        resetVoiceButtonUI()
 
         audioFile?.let { processVoiceInput(it) }
+    }
+
+    private fun resetVoiceButtonUI() {
+        binding.voiceButton.setIconResource(R.drawable.ic_mic)
+        binding.voiceButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.secondary))
+        binding.voiceHint.text = "长按说话"
+        binding.voiceHint.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_hint))
     }
 
     private fun processVoiceInput(audioFile: File) {
