@@ -77,6 +77,8 @@ object SiliconFlowClient {
             val response = client.newCall(request).execute()
             val responseBody = response.body?.string() ?: return@withContext Result.failure(Exception("Empty response"))
             
+            android.util.Log.d("SiliconFlow", "chatWithAudio Response: $responseBody")
+            
             val json = gson.fromJson(responseBody, JsonObject::class.java)
             val content = json
                 .getAsJsonArray("choices")
@@ -148,6 +150,8 @@ object SiliconFlowClient {
             
             val response = client.newCall(request).execute()
             val responseBody = response.body?.string() ?: return@withContext Result.failure(Exception("Empty response"))
+            
+            android.util.Log.d("SiliconFlow", "chatWithText Response: $responseBody")
             
             val json = gson.fromJson(responseBody, JsonObject::class.java)
             val content = json
