@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.yinfuapp.data.adapter.ChatAdapter
 import com.example.yinfuapp.data.api.SiliconFlowClient
 import com.example.yinfuapp.data.local.ChatHistoryManager
+import com.example.yinfuapp.data.model.ChatMessage
 import com.example.yinfuapp.databinding.FragmentAiChatBinding
 import com.example.yinfuapp.utils.AudioPlayerHelper
 import com.example.yinfuapp.utils.VoiceHelper
