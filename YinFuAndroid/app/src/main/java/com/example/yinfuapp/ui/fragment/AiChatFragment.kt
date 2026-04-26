@@ -22,6 +22,7 @@ import com.example.yinfuapp.data.api.SiliconFlowClient
 import com.example.yinfuapp.data.local.ChatHistoryManager
 import com.example.yinfuapp.data.model.ChatMessage
 import com.example.yinfuapp.databinding.FragmentAiChatBinding
+import com.example.yinfuapp.ui.activity.AiCallActivity
 import com.example.yinfuapp.utils.AudioPlayerHelper
 import com.example.yinfuapp.utils.RealtimeAudioManager
 import com.example.yinfuapp.utils.VoiceHelper
@@ -207,26 +208,7 @@ class AiChatFragment : Fragment() {
     }
 
     private fun startCall() {
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO)
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
-            return
-        }
-
-        isInCall = true
-        binding.callStatusContainer.visibility = View.VISIBLE
-        binding.callStatusText.text = "请说话..."
-        binding.callButton.setIconResource(R.drawable.ic_stop)
-        binding.callButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.danger))
-        binding.callHint.text = "正在收音"
-        binding.callHint.setTextColor(ContextCompat.getColor(requireContext(), R.color.danger))
-
-        if (messages.isEmpty()) {
-            addWelcomeMessage()
-        }
-
-        realtimeAudioManager.startRecording()
+        AiCallActivity.start(requireContext(), AiCallActivity.CALL_TYPE_CHAT)
     }
 
     private fun endCall() {

@@ -11,6 +11,11 @@
         <item name="android:windowSoftInputMode">adjustPan</item>
     </style>
 
+    <style name="Theme.YinFuApp.Fullscreen" parent="Theme.YinFuApp">
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+    </style>
+
     <style name="CardStyle">
         <item name="android:background">@color/card_background</item>
         <item name="android:padding">20dp</item>
