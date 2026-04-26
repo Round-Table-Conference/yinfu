@@ -162,16 +162,8 @@ class AiChatFragment : Fragment() {
 
     private fun processVoiceInput(audioFile: File) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val historyMessages = messages
-                .filter { !it.isFromUser && it.content != "您好！我在这里陪伴您。有什么想聊的，或者有什么心事想倾诉吗？我会用心倾听并陪伴您。" }
-                .map { "assistant" to it.content }
-
-            val result = SiliconFlowClient.chatWithAudio(
-                audioFile = audioFile,
-                systemPrompt = systemPrompt,
-                historyMessages = historyMessages
-            )
-
+            val result = SiliconFlowClient.speechToText(audioFile)
+            
             result.onSuccess { recognizedText ->
                 activity?.runOnUiThread {
                     binding.messageInput.setText(recognizedText)

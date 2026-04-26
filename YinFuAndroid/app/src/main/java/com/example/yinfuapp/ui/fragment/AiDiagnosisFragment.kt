@@ -161,15 +161,7 @@ class AiDiagnosisFragment : Fragment() {
 
     private fun processVoiceInput(audioFile: File) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val historyMessages = messages
-                .filter { !it.isFromUser && it.content != "您好！我是AI医疗助手。根据您描述的症状，我可以提供一些初步的健康咨询建议。请告诉我您有哪些不适症状？" }
-                .map { "assistant" to it.content }
-
-            val result = SiliconFlowClient.chatWithAudio(
-                audioFile = audioFile,
-                systemPrompt = systemPrompt,
-                historyMessages = historyMessages
-            )
+            val result = SiliconFlowClient.speechToText(audioFile)
 
             result.onSuccess { recognizedText ->
                 activity?.runOnUiThread {

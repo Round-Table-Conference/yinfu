@@ -14,7 +14,7 @@ class VoiceHelper(private val context: Context) {
     fun startRecording(): File? {
         if (isRecording) return null
         
-        outputFile = File(context.cacheDir, "voice_${System.currentTimeMillis()}.wav")
+        outputFile = File(context.cacheDir, "voice_${System.currentTimeMillis()}.mp3")
         
         recorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             MediaRecorder(context)
@@ -23,10 +23,10 @@ class VoiceHelper(private val context: Context) {
             MediaRecorder()
         }.apply {
             setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.DEFAULT)
-            setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT)
-            setAudioSamplingRate(8000)
-            setAudioEncodingBitRate(6400)
+            setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+            setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+            setAudioSamplingRate(16000)
+            setAudioEncodingBitRate(128000)
             setOutputFile(outputFile?.absolutePath)
             prepare()
             start()
