@@ -26,7 +26,7 @@ class VoiceHelper(private val context: Context) {
             setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
             setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
             setAudioSamplingRate(16000)
-            setAudioEncodingRate(128000)
+            setAudioEncodingBitRate(128000)
             setOutputFile(outputFile?.absolutePath)
             prepare()
             start()
