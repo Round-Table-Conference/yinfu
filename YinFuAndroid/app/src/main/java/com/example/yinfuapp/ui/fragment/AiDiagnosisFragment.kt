@@ -3,6 +3,8 @@ package com.example.yinfuapp.ui.fragment
 import android.Manifest
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -20,6 +22,7 @@ import com.example.yinfuapp.data.local.ChatHistoryManager
 import com.example.yinfuapp.data.model.ChatMessage
 import com.example.yinfuapp.databinding.FragmentAiDiagnosisBinding
 import com.example.yinfuapp.utils.AudioPlayerHelper
+import com.example.yinfuapp.utils.RealtimeAudioManager
 import com.example.yinfuapp.utils.VoiceHelper
 import kotlinx.coroutines.launch
 import java.io.File
@@ -30,10 +33,12 @@ class AiDiagnosisFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var chatAdapter: ChatAdapter
-    private val messages = mutableListOf<com.example.yinfuapp.data.model.ChatMessage>()
+    private val messages = mutableListOf<ChatMessage>()
     private lateinit var chatHistoryManager: ChatHistoryManager
     private lateinit var voiceHelper: VoiceHelper
     private lateinit var audioPlayer: AudioPlayerHelper
+    private lateinit var realtimeAudioManager: RealtimeAudioManager
+    private var isInCall = false
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -66,9 +71,79 @@ class AiDiagnosisFragment : Fragment() {
         chatHistoryManager = ChatHistoryManager.getInstance(requireContext())
         voiceHelper = VoiceHelper(requireContext())
         audioPlayer = AudioPlayerHelper(requireContext())
+        realtimeAudioManager = RealtimeAudioManager(requireContext())
+        setupRealtimeAudioManager()
         setupRecyclerView()
         setupClickListeners()
         loadHistory()
+    }
+
+    private fun setupRealtimeAudioManager() {
+        realtimeAudioManager.onRecordingStarted = {
+            activity?.runOnUiThread {
+                updateCallUI(true, "请说话...")
+                binding.callButton.setIconResource(R.drawable.ic_stop)
+                binding.callButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.danger))
+                binding.callHint.text = "正在收音"
+                binding.callHint.setTextColor(ContextCompat.getColor(requireContext(), R.color.danger))
+            }
+        }
+        realtimeAudioManager.onSpeakingStarted = {
+            activity?.runOnUiThread {
+                binding.callStatusText.text = "正在说话..."
+                binding.callIndicator.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.success))
+            }
+        }
+        realtimeAudioManager.onSilenceDetected = {
+            activity?.runOnUiThread {
+                binding.callStatusText.text = "正在识别..."
+            }
+        }
+        realtimeAudioManager.onRecordingStopped = {
+            activity?.runOnUiThread {
+                binding.callStatusText.text = "识别中..."
+            }
+        }
+        realtimeAudioManager.onSpeechRecognized = { text ->
+            activity?.runOnUiThread {
+                val userMessage = ChatMessage(content = text, isFromUser = true)
+                messages.add(userMessage)
+                chatAdapter.submitList(messages.toList())
+                scrollToBottom()
+                binding.callStatusText.text = "AI分析中..."
+                chatWithAIForCall(text)
+            }
+        }
+        realtimeAudioManager.onAISpeakingStarted = {
+            activity?.runOnUiThread {
+                binding.callStatusText.text = "AI回复中..."
+                binding.callIndicator.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.warning))
+            }
+        }
+        realtimeAudioManager.onAISpeakingFinished = {
+            activity?.runOnUiThread {
+                if (isInCall) {
+                    binding.callStatusText.text = "请说话..."
+                    binding.callIndicator.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.success))
+                    binding.callHint.text = "正在收音"
+                    binding.callHint.setTextColor(ContextCompat.getColor(requireContext(), R.color.danger))
+
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        if (isInCall) {
+                            realtimeAudioManager.startRecording()
+                        }
+                    }, 500)
+                }
+            }
+        }
+        realtimeAudioManager.onError = { error ->
+            activity?.runOnUiThread {
+                Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
+                if (isInCall) {
+                    binding.callStatusText.text = "请说话..."
+                }
+            }
+        }
     }
 
     private fun setupRecyclerView() {
@@ -116,6 +191,60 @@ class AiDiagnosisFragment : Fragment() {
                 else -> false
             }
         }
+
+        binding.callButton.setOnClickListener {
+            if (isInCall) {
+                endCall()
+            } else {
+                startCall()
+            }
+        }
+
+        binding.endCallButton.setOnClickListener {
+            endCall()
+        }
+    }
+
+    private fun startCall() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+            return
+        }
+
+        isInCall = true
+        binding.callStatusContainer.visibility = View.VISIBLE
+        binding.callStatusText.text = "请说话..."
+        binding.callButton.setIconResource(R.drawable.ic_stop)
+        binding.callButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.danger))
+        binding.callHint.text = "正在收音"
+        binding.callHint.setTextColor(ContextCompat.getColor(requireContext(), R.color.danger))
+
+        if (messages.isEmpty()) {
+            addWelcomeMessage()
+        }
+
+        realtimeAudioManager.startRecording()
+    }
+
+    private fun endCall() {
+        isInCall = false
+        realtimeAudioManager.stopAISpeaking()
+        binding.callStatusContainer.visibility = View.GONE
+        resetCallButtonUI()
+    }
+
+    private fun resetCallButtonUI() {
+        binding.callButton.setIconResource(R.drawable.ic_phone)
+        binding.callButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.success))
+        binding.callHint.text = "AI通话"
+        binding.callHint.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_hint))
+    }
+
+    private fun updateCallUI(inCall: Boolean, status: String) {
+        binding.callStatusContainer.visibility = if (inCall) View.VISIBLE else View.GONE
+        binding.callStatusText.text = status
     }
 
     private fun loadHistory() {
@@ -238,7 +367,7 @@ class AiDiagnosisFragment : Fragment() {
                 val result = SiliconFlowClient.chatWithText(requestMessages)
 
                 result.onSuccess { aiContent ->
-                    val aiMessage = com.example.yinfuapp.data.model.ChatMessage(
+                    val aiMessage = ChatMessage(
                         content = aiContent,
                         isFromUser = false
                     )
@@ -257,10 +386,67 @@ class AiDiagnosisFragment : Fragment() {
         }
     }
 
+    private fun chatWithAIForCall(userMessage: String) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val requestMessages = mutableListOf<Map<String, Any>>()
+                requestMessages.add(mapOf(
+                    "role" to "system",
+                    "content" to listOf(mapOf("type" to "text", "text" to systemPrompt))
+                ))
+                messages.filter { !it.isFromUser && it.content != "您好！我是AI医疗助手。根据您描述的症状，我可以提供一些初步的健康咨询建议。请告诉我您有哪些不适症状？" }
+                    .forEach {
+                        requestMessages.add(mapOf(
+                            "role" to "assistant",
+                            "content" to listOf(mapOf("type" to "text", "text" to it.content))
+                        ))
+                    }
+                requestMessages.add(mapOf(
+                    "role" to "user",
+                    "content" to listOf(mapOf("type" to "text", "text" to userMessage))
+                ))
+
+                val result = SiliconFlowClient.chatWithText(requestMessages)
+
+                result.onSuccess { aiContent ->
+                    val aiMessage = ChatMessage(
+                        content = aiContent,
+                        isFromUser = false
+                    )
+                    messages.add(aiMessage)
+                    chatAdapter.submitList(messages.toList())
+                    scrollToBottom()
+                    saveHistory()
+
+                    if (isInCall) {
+                        realtimeAudioManager.speakAIResponse(aiContent)
+                    }
+                }.onFailure { error ->
+                    if (isInCall) {
+                        realtimeAudioManager.onError?.invoke("AI 回复失败: ${error.message}")
+                    } else {
+                        Toast.makeText(context, "AI 回复失败: ${error.message}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+
+            } catch (e: Exception) {
+                if (isInCall) {
+                    realtimeAudioManager.onError?.invoke("网络错误: ${e.message}")
+                } else {
+                    Toast.makeText(context, "网络错误: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
+        if (isInCall) {
+            realtimeAudioManager.stopAISpeaking()
+        }
         voiceHelper.release()
         audioPlayer.release()
+        realtimeAudioManager.release()
         saveHistory()
         _binding = null
     }
