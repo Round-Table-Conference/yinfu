@@ -51,12 +51,13 @@ class AiDiagnosisFragment : Fragment() {
         }
     }
 
-    private val systemPrompt = """你是专业AI医疗助手。请简洁回复用户症状咨询。
+    private val systemPrompt = """你是专业AI医疗助手，名叫龄医生。请简洁回复用户症状咨询。
 规则：
 1. 详细的追问用户信息，给出专业的建议
 2. 严重症状请及时就医
 3. 回答简洁明了，不超过200字
-4. 不确定时建议咨询专业医生"""
+4. 不确定时建议咨询专业医生
+5. 你的名字是龄医生，是一位专业可靠的AI医疗助手"""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -218,7 +219,7 @@ class AiDiagnosisFragment : Fragment() {
     }
 
     private fun resetCallButtonUI() {
-        binding.callButton.setIconResource(R.drawable.ic_phone)
+        binding.callButton.setIconResource(R.drawable.ic_phone_1)
         binding.callButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.success))
         binding.callHint.text = "AI通话"
         binding.callHint.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_hint))
@@ -247,7 +248,7 @@ class AiDiagnosisFragment : Fragment() {
 
     private fun addWelcomeMessage() {
         val welcomeMessage = com.example.yinfuapp.data.model.ChatMessage(
-            content = "您好！我是AI医疗助手。根据您描述的症状，我可以提供一些初步的健康咨询建议。请告诉我您有哪些不适症状？",
+            content = "您好！我是龄医生。根据您描述的症状，我可以提供一些初步的健康咨询建议。请告诉我您有哪些不适症状？",
             isFromUser = false
         )
         messages.add(welcomeMessage)
@@ -334,7 +335,7 @@ class AiDiagnosisFragment : Fragment() {
                     "role" to "system",
                     "content" to listOf(mapOf("type" to "text", "text" to systemPrompt))
                 ))
-                messages.filter { !it.isFromUser && it.content != "您好！我是AI医疗助手。根据您描述的症状，我可以提供一些初步的健康咨询建议。请告诉我您有哪些不适症状？" }
+                messages.filter { !it.isFromUser && it.content != "您好！我是龄医生。根据您描述的症状，我可以提供一些初步的健康咨询建议。请告诉我您有哪些不适症状？" }
                     .forEach {
                         requestMessages.add(mapOf(
                             "role" to "assistant",
@@ -376,7 +377,7 @@ class AiDiagnosisFragment : Fragment() {
                     "role" to "system",
                     "content" to listOf(mapOf("type" to "text", "text" to systemPrompt))
                 ))
-                messages.filter { !it.isFromUser && it.content != "您好！我是AI医疗助手。根据您描述的症状，我可以提供一些初步的健康咨询建议。请告诉我您有哪些不适症状？" }
+                messages.filter { !it.isFromUser && it.content != "您好！我是龄医生。根据您描述的症状，我可以提供一些初步的健康咨询建议。请告诉我您有哪些不适症状？" }
                     .forEach {
                         requestMessages.add(mapOf(
                             "role" to "assistant",

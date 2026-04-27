@@ -148,6 +148,40 @@
 
                 </LinearLayout>
 
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="@color/border"
+                    android:layout_marginStart="@dimen/spacing_lg"/>
+
+                <LinearLayout
+                    android:id="@+id/ai_call"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="@dimen/spacing_lg"
+                    android:gravity="center_vertical"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:layout_width="@dimen/icon_size_sm"
+                        android:layout_height="@dimen/icon_size_sm"
+                        android:src="@drawable/ic_phone_1"
+                        android:contentDescription="@string/ai_call"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/ai_call"
+                        android:textSize="@dimen/font_size_md"
+                        android:textColor="@color/text_primary"
+                        android:layout_marginStart="@dimen/spacing_md"/>
+
+                </LinearLayout>
+
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>

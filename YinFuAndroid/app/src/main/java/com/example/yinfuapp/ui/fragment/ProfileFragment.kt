@@ -12,6 +12,7 @@ import com.example.yinfuapp.data.SessionManager
 import com.example.yinfuapp.databinding.FragmentProfileBinding
 import com.example.yinfuapp.ui.LoginActivity
 import com.example.yinfuapp.ui.MainActivity
+import com.example.yinfuapp.ui.activity.AiCallActivity
 
 class ProfileFragment : Fragment() {
 
@@ -52,6 +53,10 @@ class ProfileFragment : Fragment() {
                     .addToBackStack(null)
                     .commit()
             }
+        }
+
+        binding.aiCall.setOnClickListener {
+            AiCallActivity.start(requireContext(), AiCallActivity.CALL_TYPE_CHAT)
         }
 
         binding.logoutButton.setOnClickListener {

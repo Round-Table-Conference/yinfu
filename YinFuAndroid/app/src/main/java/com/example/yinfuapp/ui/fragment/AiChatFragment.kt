@@ -52,12 +52,13 @@ class AiChatFragment : Fragment() {
         }
     }
 
-    private val systemPrompt = """你是温暖关怀的心理陪伴助手。简洁回复，倾听支持。
+    private val systemPrompt = """你是温暖关怀的心理陪伴助手，名叫龄小助。简洁回复，倾听支持。
 原则：
 1. 倾听理解，不评判
 2. 回答简洁，不超过150字
 3. 给予积极正向的支持
-4. 保持耐心友善"""
+4. 保持耐心友善
+5. 你的名字是龄小助，是一个温柔体贴的AI伙伴"""
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -219,7 +220,7 @@ class AiChatFragment : Fragment() {
     }
 
     private fun resetCallButtonUI() {
-        binding.callButton.setIconResource(R.drawable.ic_phone)
+        binding.callButton.setIconResource(R.drawable.ic_phone_1)
         binding.callButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.success))
         binding.callHint.text = "AI通话"
         binding.callHint.setTextColor(ContextCompat.getColor(requireContext(), R.color.text_hint))
@@ -248,7 +249,7 @@ class AiChatFragment : Fragment() {
 
     private fun addWelcomeMessage() {
         val welcomeMessage = ChatMessage(
-            content = "您好！我在这里陪伴您。有什么想聊的，或者有什么心事想倾诉吗？我会用心倾听并陪伴您。",
+            content = "你好！我是龄小助，在这里陪伴你。有什么想聊的，或者有什么心事想倾诉吗？我会用心倾听并陪伴你。",
             isFromUser = false
         )
         messages.add(welcomeMessage)
@@ -335,7 +336,7 @@ class AiChatFragment : Fragment() {
                     "role" to "system",
                     "content" to listOf(mapOf("type" to "text", "text" to systemPrompt))
                 ))
-                messages.filter { !it.isFromUser && it.content != "您好！我在这里陪伴您。有什么想聊的，或者有什么心事想倾诉吗？我会用心倾听并陪伴您。" }
+                messages.filter { !it.isFromUser && it.content != "你好！我是龄小助，在这里陪伴你。有什么想聊的，或者有什么心事想倾诉吗？我会用心倾听并陪伴你。" }
                     .forEach { 
                         requestMessages.add(mapOf(
                             "role" to "assistant",
@@ -377,7 +378,7 @@ class AiChatFragment : Fragment() {
                     "role" to "system",
                     "content" to listOf(mapOf("type" to "text", "text" to systemPrompt))
                 ))
-                messages.filter { !it.isFromUser && it.content != "您好！我在这里陪伴您。有什么想聊的，或者有什么心事想倾诉吗？我会用心倾听并陪伴您。" }
+                messages.filter { !it.isFromUser && it.content != "你好！我是龄小助，在这里陪伴你。有什么想聊的，或者有什么心事想倾诉吗？我会用心倾听并陪伴你。" }
                     .forEach { 
                         requestMessages.add(mapOf(
                             "role" to "assistant",

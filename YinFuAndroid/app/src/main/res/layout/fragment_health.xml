@@ -124,21 +124,27 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/phone_diagnosis_card"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:visibility="invisible">
+            android:background="@drawable/feature_card_background"
+            android:padding="@dimen/spacing_lg"
+            android:gravity="center"
+            android:layout_marginStart="@dimen/spacing_sm"
+            android:clickable="true"
+            android:focusable="true">
 
             <ImageView
                 android:layout_width="@dimen/icon_size_md"
                 android:layout_height="@dimen/icon_size_md"
-                android:src="@drawable/hospital"/>
+                android:src="@drawable/ic_phone_1"/>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/medical_guide"
+                android:text="@string/phone_diagnosis"
                 android:textSize="@dimen/font_size_md"
                 android:textColor="@color/text_primary"
                 android:textStyle="bold"

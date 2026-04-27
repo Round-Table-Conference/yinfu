@@ -28,10 +28,10 @@
             android:id="@+id/sender_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="AI医生"
-            android:textSize="@dimen/font_size_xs"
+            android:text="龄医生"
             android:textColor="@color/primary"
-            android:textStyle="bold"/>
+            android:textSize="@dimen/font_size_xs"
+            android:textStyle="bold" />
 
         <com.google.android.material.card.MaterialCardView
             android:layout_width="wrap_content"

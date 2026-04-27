@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.example.yinfuapp.databinding.FragmentHealthBinding
 import com.example.yinfuapp.ui.MainActivity
+import com.example.yinfuapp.ui.activity.AiCallActivity
 
 class HealthFragment : Fragment() {
 
@@ -38,6 +39,10 @@ class HealthFragment : Fragment() {
 
         binding.healthRecordsCard.setOnClickListener {
             (activity as? MainActivity)?.navigateToHealthRecords()
+        }
+
+        binding.phoneDiagnosisCard.setOnClickListener {
+            AiCallActivity.start(requireContext(), AiCallActivity.CALL_TYPE_DIAGNOSIS)
         }
     }
 

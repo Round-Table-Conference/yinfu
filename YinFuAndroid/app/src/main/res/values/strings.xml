@@ -20,7 +20,10 @@
     <string name="medical_guide">就医指导</string>
     <string name="medication_reminder">用药提醒</string>
     <string name="ai_diagnosis">AI 问诊</string>
+    <string name="phone_diagnosis">电话问诊</string>
     <string name="health_records">健康档案</string>
+    <string name="ai_call">心理陪伴</string>
+    <string name="send">发送</string>
 
     <string name="bus_query">公交查询</string>
     <string name="subway">地铁</string>
@@ -33,7 +36,7 @@
     <string name="counselor">咨询师</string>
 
     <string name="scan_pay">扫码支付</string>
-    <string name="payment_guide">支付指引</string>
+    <string name="payment_guide">扫码支付</string>
     <string name="bankcard">支付宝付款码</string>
     <string name="transaction">微信付款码</string>
 

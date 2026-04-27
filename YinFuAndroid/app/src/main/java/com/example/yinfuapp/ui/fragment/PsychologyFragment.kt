@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.yinfuapp.databinding.FragmentPsychologyBinding
 import com.example.yinfuapp.ui.MainActivity
+import com.example.yinfuapp.ui.activity.AiCallActivity
 
 class PsychologyFragment : Fragment() {
 
@@ -34,7 +35,7 @@ class PsychologyFragment : Fragment() {
         }
 
         binding.counselorCard.setOnClickListener {
-            Toast.makeText(context, "咨询师列表", Toast.LENGTH_SHORT).show()
+            AiCallActivity.start(requireContext(), AiCallActivity.CALL_TYPE_CHAT)
         }
     }
 

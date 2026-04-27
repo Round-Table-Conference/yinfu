@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.media.AudioManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Toast
@@ -38,6 +39,7 @@ class AiCallActivity : AppCompatActivity() {
         }
     }
 
+    private val TAG = "AiCallActivity"
     private lateinit var binding: ActivityAiCallBinding
     private lateinit var chatAdapter: ChatAdapter
     private val messages = mutableListOf<ChatMessage>()
@@ -48,6 +50,8 @@ class AiCallActivity : AppCompatActivity() {
     private var isMuted = false
     private var isSpeakerOn = true
     private var isInCall = true
+    private var lastRecordingTime = 0L
+    private val recordingCooldown = 500L
 
     private var callType = CALL_TYPE_CHAT
     private var systemPrompt = ""
@@ -85,8 +89,8 @@ class AiCallActivity : AppCompatActivity() {
     }
 
     private fun setupUI() {
-        binding.callTypeText.text = if (callType == CALL_TYPE_DIAGNOSIS) "AI 医疗诊断" else "AI 智能助手"
-        binding.userNameText.text = if (callType == CALL_TYPE_DIAGNOSIS) "AI 医疗助手" else "AI 智能助手"
+        binding.callTypeText.text = if (callType == CALL_TYPE_DIAGNOSIS) "龄医生 通话" else "龄小助 通话"
+        binding.userNameText.text = if (callType == CALL_TYPE_DIAGNOSIS) "龄医生" else "龄小助"
     }
 
     private fun setupRecyclerView() {
@@ -200,17 +204,17 @@ class AiCallActivity : AppCompatActivity() {
 
     private fun setupSystemPrompt() {
         systemPrompt = if (callType == CALL_TYPE_DIAGNOSIS) {
-            "您好！我是AI医疗助手。根据您描述的症状，我可以提供一些初步的健康咨询建议。请告诉我您有哪些不适症状？"
+            "您好！我是龄医生。根据您描述的症状，我可以提供一些初步的健康咨询建议。请告诉我您有哪些不适症状？"
         } else {
-            "你是一个友好的AI助手，可以和用户进行自然的对话交流。"
+            "你好！我是龄小助，一个友好的AI助手，可以和你进行自然的对话交流。有什么我可以帮助你的吗？"
         }
     }
 
     private fun addWelcomeMessage() {
         val welcomeText = if (callType == CALL_TYPE_DIAGNOSIS) {
-            "您好！我是AI医疗助手。根据您描述的症状，我可以提供一些初步的健康咨询建议。请告诉我您有哪些不适症状？"
+            "您好！我是龄医生。根据您描述的症状，我可以提供一些初步的健康咨询建议。请告诉我您有哪些不适症状？"
         } else {
-            "您好！我是AI智能助手，很高兴为您服务。有什么我可以帮助您的吗？"
+            "你好！我是龄小助，很高兴为你服务。有什么我可以帮助你的吗？"
         }
         val welcomeMsg = ChatMessage(content = welcomeText, isFromUser = false)
         messages.add(welcomeMsg)
@@ -219,7 +223,12 @@ class AiCallActivity : AppCompatActivity() {
 
     private fun startCall() {
         isInCall = true
-        realtimeAudioManager.startRecording()
+        try {
+            realtimeAudioManager.startRecording()
+        } catch (e: Exception) {
+            Log.e(TAG, "Failed to start recording", e)
+            Toast.makeText(this, "录音启动失败，请稍后重试", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun endCall() {
@@ -231,6 +240,12 @@ class AiCallActivity : AppCompatActivity() {
     }
 
     private fun toggleMute() {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastRecordingTime < recordingCooldown) {
+            Toast.makeText(this, "请稍后再试", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         isMuted = !isMuted
         if (isMuted) {
             realtimeAudioManager.stopRecordingAndProcess()
@@ -239,11 +254,17 @@ class AiCallActivity : AppCompatActivity() {
             updateStatus("已静音")
             updateWaveState(false)
         } else {
+            lastRecordingTime = currentTime
             binding.muteButton.setIconResource(R.drawable.ic_mic)
             binding.muteButton.setBackgroundColor(getColor(R.color.danger))
             updateStatus("请说话...")
             updateWaveState(true)
-            realtimeAudioManager.startRecording()
+            try {
+                realtimeAudioManager.startRecording()
+            } catch (e: Exception) {
+                Toast.makeText(this, "录音启动失败，请稍后重试", Toast.LENGTH_SHORT).show()
+                Log.e(TAG, "Failed to start recording", e)
+            }
         }
     }
 
