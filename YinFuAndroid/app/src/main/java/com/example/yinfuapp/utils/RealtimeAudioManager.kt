@@ -25,9 +25,9 @@ class RealtimeAudioManager(private val context: Context) {
         private const val BASE_URL = "https://api.siliconflow.cn/v1"
         private const val API_KEY = "sk-yckdyvnnixuckmwqkqjpbjltfipybwuviznbkorrzbegzbyf"
 
-        private const val SILENCE_THRESHOLD = 500
-        private const val SILENCE_DURATION_MS = 1500L
-        private const val MIN_SPEECH_LENGTH_MS = 500
+        private const val SILENCE_THRESHOLD = 2000
+        private const val SILENCE_DURATION_MS = 2000L
+        private const val MIN_SPEECH_LENGTH_MS = 300
     }
 
     private val client = OkHttpClient.Builder()
@@ -64,6 +64,7 @@ class RealtimeAudioManager(private val context: Context) {
     private var isInSpeech = false
     private var hasReceivedAudio = false
     private var speechStartTime = 0L
+    private var silenceDetected = false
     private var volumeListener: ((Int) -> Unit)? = null
 
     fun startRecording() {
@@ -130,10 +131,13 @@ class RealtimeAudioManager(private val context: Context) {
         isInSpeech = false
         hasReceivedAudio = false
         speechStartTime = 0L
+        silenceDetected = false
     }
 
     private fun processVolume(volume: Int) {
         val currentTime = System.currentTimeMillis()
+
+        if (silenceDetected) return
 
         if (volume > SILENCE_THRESHOLD) {
             if (!isInSpeech) {
@@ -164,6 +168,7 @@ class RealtimeAudioManager(private val context: Context) {
                         val speechDuration = silenceStartTime - speechStartTime
                         if (speechDuration >= MIN_SPEECH_LENGTH_MS) {
                             Log.d(TAG, "Silence detected for ${SILENCE_DURATION_MS}ms, stopping recording")
+                            silenceDetected = true
                             mainHandler.post { onSilenceDetected?.invoke() }
                             stopRecordingAndProcess()
                             return
@@ -177,6 +182,7 @@ class RealtimeAudioManager(private val context: Context) {
                         val speechDuration = lastSpeechTime - speechStartTime
                         if (speechDuration >= MIN_SPEECH_LENGTH_MS) {
                             Log.d(TAG, "Speech ended naturally, stopping recording")
+                            silenceDetected = true
                             mainHandler.post { onSilenceDetected?.invoke() }
                             stopRecordingAndProcess()
                             return
